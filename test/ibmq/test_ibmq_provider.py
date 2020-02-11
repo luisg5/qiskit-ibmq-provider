@@ -27,6 +27,7 @@ from qiskit.compiler import assemble, transpile
 from qiskit.providers.models.backendproperties import BackendProperties
 
 from ..decorators import requires_provider, requires_device
+from ..fake_account_client import BaseFakeAccountClient
 from ..ibmqtestcase import IBMQTestCase
 
 
@@ -177,3 +178,14 @@ class TestAccountProvider(IBMQTestCase, providers.ProviderTestCase):
                              if isinstance(getattr(self.provider.backends, back), IBMQBackend)}
         backends = {back.name().lower() for back in self.provider._backends.values()}
         self.assertEqual(provider_backends, backends)
+
+    @requires_provider
+    def test_provider_transpiler_service(self, provider):
+        backend = provider.get_backend('ibmq_qasm_simulator')
+        provider._api = BaseFakeAccountClient()
+        transpiler_service = provider.transpiler_service(preset=0)
+
+        qobj = assemble(self.qc1, backend=backend)
+        transpiled_circuit = transpiler_service.run(qobj)  # This will block.
+        print(transpiled_circuit)
+

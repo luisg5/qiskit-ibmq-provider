@@ -24,6 +24,7 @@ from concurrent.futures import ThreadPoolExecutor, wait
 from qiskit.test.mock.backends.poughkeepsie.fake_poughkeepsie import FakePoughkeepsie
 from qiskit.providers.ibmq.apiconstants import ApiJobStatus, API_JOB_FINAL_STATES, ApiJobShareLevel
 from qiskit.providers.ibmq.api.exceptions import RequestsApiError
+from qiskit.providers.ibmq.api.rest.validation import IBMQTranspilerService
 
 
 VALID_RESULT_RESPONSE = {
@@ -218,6 +219,19 @@ class BaseFakeAccountClient:
         if job_id not in self._jobs:
             raise RequestsApiError('Job not found., Error code: 3250.')
         return self._jobs[job_id]
+
+    def transpiler_service_get(self, preset):
+        """"""
+        return {
+            'upload_url': 'http://www.upload_url.com/index.html',
+            'download_url': 'http://www.download_url.com/index.html'
+        }
+
+    def transpiler_service_submit(self, upload_url, qobj_dict):
+        return ''
+
+    def transpiler_service_result(self, download_url):
+        return 'qobj'
 
 
 class JobSubmitFailClient(BaseFakeAccountClient):

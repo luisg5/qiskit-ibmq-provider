@@ -28,7 +28,7 @@ from qiskit.providers.ibmq.apiconstants import (API_JOB_FINAL_STATES, ApiJobStat
 
 from ..exceptions import (RequestsApiError, WebsocketError,
                           WebsocketTimeoutError, UserTimeoutExceededError)
-from ..rest import Api
+from ..rest import Api, transpilerservice
 from ..session import RetrySession
 from ..exceptions import ApiIBMQProtocolError
 from .base import BaseClient
@@ -524,3 +524,23 @@ class AccountClient(BaseClient):
             job cancellation response.
         """
         return self.client_api.job(job_id).cancel()
+
+    def transpiler_service_get(self, preset: int = 0):
+        """Return the transpiler service
+
+        # TODO: Update documentation.
+        Returns:
+             pass
+        """
+        return self.client_api.transpilerservice(preset).get()
+
+    def transpiler_service_submit(self, upload_url, qobj):
+        """Upload q Qobj to the transpiler via object storage
+
+        Returns:
+            pass
+        """
+        return self.client_api.put_object_storage_transpiler_service(upload_url, qobj)
+
+    def transpiler_service_result(self, download_url):
+        return self.client_api.transpiler_service_result_get(download_url)

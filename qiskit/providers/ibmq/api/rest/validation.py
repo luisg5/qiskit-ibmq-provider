@@ -15,14 +15,18 @@
 """Schemas for validation."""
 # TODO The schemas defined here should be merged with others under rest/schemas
 # when they are ready
+import time
+
 from marshmallow import pre_load
 from marshmallow.validate import OneOf
 
 from qiskit.providers.ibmq.apiconstants import ApiJobStatus
-from qiskit.validation import BaseSchema
-from qiskit.validation.fields import String, Nested, Integer, DateTime, Float
+from qiskit.assembler.disassemble import disassemble
+from qiskit.validation import BaseSchema, BaseModel, bind_schema
+from qiskit.validation.fields import String, Nested, Integer, DateTime, Float, Url
 
 from qiskit.providers.ibmq.utils.fields import map_field_names
+from qiskit.providers.ibmq.api.exceptions import UserTimeoutExceededError
 
 
 # Helper schemas.
@@ -80,3 +84,57 @@ class BackendJobLimitResponseSchema(BaseSchema):
             'runningJobs': 'running_jobs'
         }
         return map_field_names(FIELDS_MAP, data)
+
+
+class TranspilerServiceResponseSchema(BaseSchema):
+    """Schema for transpiler service"""
+    # Required properties.
+    # TODO: Could change these fields to Url type when in place
+    upload_url = String(required=True, description="the object storage upload url to use for transpilation.")
+    download_url = String(required=True, description="the object storage download url to use for transpilation.")
+
+
+@bind_schema(TranspilerServiceResponseSchema)
+class IBMQTranspilerService(BaseModel):
+    """Transpiler Service
+
+    # TODO: Update docs.
+    Returns:
+        pass
+    """
+    def __init__(self, api: 'AccountClient', upload_url: str, download_url, **kwargs):
+        self.upload_url = upload_url
+        self.download_url = download_url
+        self._api = api
+        super().__init__(**kwargs)
+
+    def run(self, qobj, transpile_config=None, wait=5, timeout=None):
+        """Submit the payload to the upload url.
+
+        # Update doc.
+        Returns:
+            pass
+        """
+        # Make a request to upload the job via url
+        qobj_dict = qobj.to_dict()
+        qobj_dict.upadate({
+            'transpile_config': transpile_config
+        })
+        # Still need to update the configuration with the qobj.
+        _ = self._api.transpiler_service_submit(self.upload_url, qobj_dict)
+
+        # Poll for the result.
+        start_time = time.time()
+        transpiler_response = None
+        while transpiler_response is None:
+            elapsed_time = time.time() - start_time
+            if timeout is not None and elapsed_time >= timeout:
+                raise UserTimeoutExceededError('Timeout while waiting circuit trasnpilation {}')
+            time.sleep(wait)
+            try:
+                transpiler_response = self._api.transpiler_service_result(self.download_url)  # TODO: Is a Qobj returned or is it part of the response.
+            except Exception as ex:  # TODO: What would be a worthy exception to keep going?
+                pass
+
+        circuits, run_config, user_qobj_header = disassemble(qobj)  # TODO: The
+        return qobj_dict  # TODO: This should be removed once we get the results via polling.

@@ -24,6 +24,7 @@ from qiskit.providers.models import (QasmBackendConfiguration,
 from qiskit.validation.exceptions import ModelValidationError
 
 from .api.clients import AccountClient
+from .api.rest.validation import IBMQTranspilerService
 from .ibmqbackend import IBMQBackend, IBMQSimulator
 from .credentials import Credentials
 from .ibmqbackendservice import IBMQBackendService
@@ -68,6 +69,34 @@ class AccountProvider(BaseProvider):
         # `.backends()` is an abstract method. Upon initialization, it is
         # replaced by a `IBMQBackendService` instance.
         pass
+
+    def transpiler_service(self, preset: int = 0):
+        """Return a traspiler service object.
+
+        # TODO: Update docs.
+        Args:
+            preset: The preset for the circuit. Default 0.
+        Returns:
+            transpiler service object that is used to send circuits to.
+
+        Raises:
+            Exception: if there was an unexpected error with the request.
+        """
+        # upload_url = self._api.transpiler_service()
+        transpiler_service_info = self._api.transpiler_service_get(preset)
+        # TODO: Check if it's not a dict, then raise a warning or exception?
+        try:
+            transpiler_service_info.update({
+                'api': self._api
+            })
+            transpiler_service = IBMQTranspilerService.from_dict(transpiler_service_info)
+        except ModelValidationError as ex:
+            logger.warning(
+                'Transpiler service could not be instantiated due to an '
+                'invalid config: %s', ex)
+            raise
+
+        return transpiler_service
 
     def _discover_remote_backends(self, timeout: Optional[float] = None) -> Dict[str, IBMQBackend]:
         """Return the remote backends available.

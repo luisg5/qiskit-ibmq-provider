@@ -21,6 +21,7 @@ from typing import Dict, List, Optional, Any
 from .base import RestAdapterBase
 from .backend import Backend
 from .job import Job
+from .transpilerservice import TranspilerService
 
 
 class Api(RestAdapterBase):
@@ -56,6 +57,10 @@ class Api(RestAdapterBase):
             the backend adapter.
         """
         return Job(self.session, job_id)
+
+    def transpilerservice(self, preset: int) -> TranspilerService:
+        """"""
+        return TranspilerService(self.session, preset)
 
     def backends(self, timeout: Optional[float] = None) -> List[Dict[str, Any]]:
         """Return the list of backends.
@@ -200,6 +205,14 @@ class Api(RestAdapterBase):
         }
 
         return self.session.post(url, json=payload).json()
+
+    def put_object_storage_transpiler_service(self, upload_url, qobj_dict) -> Dict[str, Any]:
+        """"""
+        response = self.session.put(upload_url, json=qobj_dict, bare=True)
+        return response.text
+
+    def transpiler_service_result_get(self, download_url):
+        return self.session.get(download_url, bare=True)
 
     def version(self) -> Dict[str, Any]:
         """Return the API versions."""
