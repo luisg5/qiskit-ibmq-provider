@@ -108,7 +108,7 @@ class IBMQTranspilerService(BaseModel):
         self._api = api
         super().__init__(**kwargs)
 
-    def run(self, qobj, transpile_config: dict = None, wait: int = 5, timeout: int = None):
+    def run(self, qobj, transpile_config: dict = None, wait: int = 3, timeout: int = None):
         """Submit the payload to the upload url.
 
         # Update doc.
@@ -119,24 +119,22 @@ class IBMQTranspilerService(BaseModel):
         qobj_dict = qobj.to_dict()
         # Update the configuration if it is passed.
         if transpile_config:
-            qobj_dict.upadate({
-                'transpile_config': transpile_config
-            })
+            qobj_dict['transpile_config'] = transpile_config
         # Still need to update the configuration with the qobj.
         _ = self._api.transpiler_service_submit(self.upload_url, qobj_dict)
 
         # Poll for the result.
         start_time = time.time()
-        transpiler_response = None
-        while transpiler_response is None:
+        serverless_transpiler_response = None
+        while serverless_transpiler_response is None:
             elapsed_time = time.time() - start_time
             if timeout is not None and elapsed_time >= timeout:
                 raise UserTimeoutExceededError('Timeout while waiting circuit trasnpilation {}')
             time.sleep(wait)
             try:
-                transpiler_response = self._api.transpiler_service_result(self.download_url)  # TODO: Is a Qobj returned or is it part of the response.
+                serverless_transpiler_response = self._api.transpiler_service_result(self.download_url)
             except Exception as ex:  # TODO: What would be a worthy exception to keep going?
                 pass
 
-        circuits, run_config, user_qobj_header = disassemble(qobj)  # TODO: The
-        return qobj_dict  # TODO: This should be removed once we get the results via polling.
+        circuits, _, _ = disassemble(serverless_transpiler_response)
+        return circuits[0] if len(circuits) == 1 else circuits

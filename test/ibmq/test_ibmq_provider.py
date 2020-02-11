@@ -192,5 +192,5 @@ class TestAccountProvider(IBMQTestCase, providers.ProviderTestCase):
             'coupling_map': [[0, 1], [1, 0], [1, 2], [1, 3], [2, 1], [3, 1], [3, 4], [4, 3]]
         }
         transpiled_circuit = serverless_transpiler.run(qobj, transpile_config)  # This will block.
-        print(transpiled_circuit)
+        self.assertTrue(transpiled_circuit)
 
