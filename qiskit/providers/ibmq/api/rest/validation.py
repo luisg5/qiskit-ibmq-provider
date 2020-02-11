@@ -22,6 +22,7 @@ from marshmallow.validate import OneOf
 
 from qiskit.providers.ibmq.apiconstants import ApiJobStatus
 from qiskit.assembler.disassemble import disassemble
+from qiskit.qobj import Qobj
 from qiskit.validation import BaseSchema, BaseModel, bind_schema
 from qiskit.validation.fields import String, Nested, Integer, DateTime, Float, Url
 
@@ -129,12 +130,12 @@ class IBMQTranspilerService(BaseModel):
         while serverless_transpiler_response is None:
             elapsed_time = time.time() - start_time
             if timeout is not None and elapsed_time >= timeout:
-                raise UserTimeoutExceededError('Timeout while waiting circuit trasnpilation {}')
+                raise UserTimeoutExceededError('Timeout while waiting circuit trasnpilation.')
             time.sleep(wait)
             try:
                 serverless_transpiler_response = self._api.transpiler_service_result(self.download_url)
             except Exception as ex:  # TODO: What would be a worthy exception to keep going?
                 pass
 
-        circuits, _, _ = disassemble(serverless_transpiler_response)
+        circuits, _, _ = disassemble(Qobj.from_dict(serverless_transpiler_response))
         return circuits[0] if len(circuits) == 1 else circuits

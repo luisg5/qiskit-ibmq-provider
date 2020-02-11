@@ -32,7 +32,8 @@ class TranspilerService(RestAdapterBase):
     """Rest adapter for job related endpoints."""
 
     URL_MAP = {
-        'self': '',
+        'self': 'https://us-south.functions.cloud.ibm.com/api/v1/web/'
+                '1d8ef74d-78f2-4214-a876-b8e011a0c87e/default/object_storage_provider_fn.json',
     }
 
     def __init__(self, session: RetrySession, preset: int) -> None:
@@ -43,8 +44,8 @@ class TranspilerService(RestAdapterBase):
             job_id: id of the job.
         """
         self.preset = preset
-        timestamp = time.time()
-        super().__init__(session, '/transpilerService-{}-{}'.format(timestamp, preset))
+        self.name = int(time.time())
+        super().__init__(session, '')
 
     def get(self) -> Dict[str, Any]:
         """Return a job.
@@ -53,4 +54,7 @@ class TranspilerService(RestAdapterBase):
             json response.
         """
         url = self.get_url('self')
-        return self.session.get(url, bare=True).json()
+        return self.session.post(url,
+                                 json={'name': str(self.name), 'preset': "preset_{}".format(self.preset)},
+                                 headers={'Content-Type': 'application/json'},
+                                 bare=True).json()

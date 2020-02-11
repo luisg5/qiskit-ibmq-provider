@@ -212,7 +212,7 @@ class Api(RestAdapterBase):
         return response.text
 
     def transpiler_service_result_get(self, download_url):
-        return self.session.get(download_url, bare=True)
+        return self.session.get(download_url, bare=True).json()
 
     def version(self) -> Dict[str, Any]:
         """Return the API versions."""
