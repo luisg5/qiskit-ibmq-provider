@@ -108,7 +108,7 @@ class IBMQTranspilerService(BaseModel):
         self._api = api
         super().__init__(**kwargs)
 
-    def run(self, qobj, transpile_config=None, wait=5, timeout=None):
+    def run(self, qobj, transpile_config: dict = None, wait: int = 5, timeout: int = None):
         """Submit the payload to the upload url.
 
         # Update doc.
@@ -117,9 +117,11 @@ class IBMQTranspilerService(BaseModel):
         """
         # Make a request to upload the job via url
         qobj_dict = qobj.to_dict()
-        qobj_dict.upadate({
-            'transpile_config': transpile_config
-        })
+        # Update the configuration if it is passed.
+        if transpile_config:
+            qobj_dict.upadate({
+                'transpile_config': transpile_config
+            })
         # Still need to update the configuration with the qobj.
         _ = self._api.transpiler_service_submit(self.upload_url, qobj_dict)
 

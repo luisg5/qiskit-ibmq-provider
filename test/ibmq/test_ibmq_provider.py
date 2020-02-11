@@ -183,9 +183,14 @@ class TestAccountProvider(IBMQTestCase, providers.ProviderTestCase):
     def test_provider_transpiler_service(self, provider):
         backend = provider.get_backend('ibmq_qasm_simulator')
         provider._api = BaseFakeAccountClient()
-        transpiler_service = provider.transpiler_service(preset=0)
+        serverless_transpiler = provider.serverless_transpiler(preset=0)
 
         qobj = assemble(self.qc1, backend=backend)
-        transpiled_circuit = transpiler_service.run(qobj)  # This will block.
+        transpile_config = {
+            'basis_gates': ['u1', 'u2', 'u3', 'cx', 'id'],
+            'optimization_level': 1, 'initial_layout': [],
+            'coupling_map': [[0, 1], [1, 0], [1, 2], [1, 3], [2, 1], [3, 1], [3, 4], [4, 3]]
+        }
+        transpiled_circuit = serverless_transpiler.run(qobj, transpile_config)  # This will block.
         print(transpiled_circuit)
 

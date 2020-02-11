@@ -70,7 +70,7 @@ class AccountProvider(BaseProvider):
         # replaced by a `IBMQBackendService` instance.
         pass
 
-    def transpiler_service(self, preset: int = 0):
+    def serverless_transpiler(self, preset: int = 0):
         """Return a traspiler service object.
 
         # TODO: Update docs.
