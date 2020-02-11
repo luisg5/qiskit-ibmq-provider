@@ -109,7 +109,7 @@ class IBMQTranspilerService(BaseModel):
         self._api = api
         super().__init__(**kwargs)
 
-    def run(self, qobj, transpile_config: dict = None, wait: int = 3, timeout: int = None):
+    def run(self, qobj, transpile_config: dict = None, timeout: int = None):
         """Submit the payload to the upload url.
 
         # Update doc.
@@ -131,10 +131,9 @@ class IBMQTranspilerService(BaseModel):
             elapsed_time = time.time() - start_time
             if timeout is not None and elapsed_time >= timeout:
                 raise UserTimeoutExceededError('Timeout while waiting circuit trasnpilation.')
-            time.sleep(wait)
             try:
                 serverless_transpiler_response = self._api.transpiler_service_result(self.download_url)
-            except Exception as ex:  # TODO: What would be a worthy exception to keep going?
+            except Exception as ex:
                 pass
 
         circuits, _, _ = disassemble(Qobj.from_dict(serverless_transpiler_response))
