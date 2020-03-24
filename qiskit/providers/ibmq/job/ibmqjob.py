@@ -313,8 +313,12 @@ class IBMQJob(BaseModel, BaseJob):
             raise IBMQJobUpdateError('An error occurred when updating the name '
                                      'for job {}. Please, try again.'.format(self.job_id()))
 
+        old_self_copy_name = self._name
         # Cache updated name.
         self._name = updated_name
+        logger.debug('OLD_SELF_NAME = %s, NEW_SELF_NAME = %s, NEW_NAME_UPDATED = %s, '
+                     'DESIRED_NAME_TO_UPDATE = %s', old_self_copy_name, self._name,
+                     updated_name, name)
 
         return self._name
 
@@ -372,8 +376,13 @@ class IBMQJob(BaseModel, BaseJob):
                                      'for job {}. Please, try again.'
                                      .format(self.job_id()))
 
+        old_self_copy_tags = self._tags
         # Cache the updated tags.
         self._tags = updated_tags
+
+        logger.debug('OLD_SELF_TAGS = %s, NEW_SELF_TAGS = %s, NEW_TAGS_UPDATED = %s, '
+                     'DESIRED_TAGS_TO_UPDATE = %s', old_self_copy_tags, self._tags,
+                     updated_tags, tags_to_update)
 
         return self._tags
 
