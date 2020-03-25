@@ -417,8 +417,6 @@ class TestIBMQJobManager(IBMQTestCase):
                 self.assertIn(job_set._id_long, job.tags(),
                               'The job {} with tags {} does not contain the job set '
                               'long id "{}".'.format(job_id, job.tags(), job_set._id_long))
-                # Assert the message of one log record output.
-                self.assertIn('used internally by the ibmq-provider.', log_records.output[i])
 
 
 class TestResultManager(IBMQTestCase):
