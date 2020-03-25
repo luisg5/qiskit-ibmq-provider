@@ -316,8 +316,8 @@ class IBMQJob(BaseModel, BaseJob):
         old_self_copy_name = self._name
         # Cache updated name.
         self._name = updated_name
-        logger.debug('OLD_SELF_NAME = %s, NEW_SELF_NAME = %s, NEW_NAME_UPDATED = %s, '
-                     'DESIRED_NAME_TO_UPDATE = %s', old_self_copy_name, self._name,
+        logger.debug('\nOLD_SELF_NAME = %s, \nNEW_SELF_NAME = %s, \nNEW_NAME_UPDATED = %s, '
+                     '\nDESIRED_NAME_TO_UPDATE = %s', old_self_copy_name, self._name,
                      updated_name, name)
 
         return self._name
@@ -380,8 +380,8 @@ class IBMQJob(BaseModel, BaseJob):
         # Cache the updated tags.
         self._tags = updated_tags
 
-        logger.debug('OLD_SELF_TAGS = %s, NEW_SELF_TAGS = %s, NEW_TAGS_UPDATED = %s, '
-                     'DESIRED_TAGS_TO_UPDATE = %s', old_self_copy_tags, self._tags,
+        logger.debug('\nOLD_SELF_TAGS = %s, \nNEW_SELF_TAGS = %s, \nNEW_TAGS_UPDATED = %s, '
+                     '\nDESIRED_TAGS_TO_UPDATE = %s', old_self_copy_tags, self._tags,
                      updated_tags, tags_to_update)
 
         return self._tags

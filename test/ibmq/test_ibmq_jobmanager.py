@@ -31,8 +31,6 @@ from qiskit.providers.ibmq.managed.exceptions import (
     IBMQJobManagerJobNotFound, IBMQManagedResultDataNotAvailable, IBMQJobManagerInvalidStateError)
 from qiskit.providers.jobstatus import JobStatus, JOB_FINAL_STATES
 from qiskit.providers.ibmq import IBMQ_PROVIDER_LOGGER_NAME
-from qiskit.providers.ibmq.ibmqbackend import IBMQBackend
-from qiskit.providers.ibmq.exceptions import IBMQBackendError
 from qiskit.compiler import transpile, assemble
 
 from ..ibmqtestcase import IBMQTestCase
@@ -360,11 +358,20 @@ class TestIBMQJobManager(IBMQTestCase):
         replacement_tags = ['{}_new_tag_{}'.format(tag_prefix, i) for i in range(2)]
         replacement_tags_with_id_long = replacement_tags + [job_set._id_long]
 
+        # TODO: It might be the implementation of the job update tags,
+        #  within job set class.
+        for job in job_set.jobs():
+            self.log.warning('BEFORE: JOB %s tags %s', job.job_id(), job.tags())
+
         # Update the tags
         _ = job_set.update_tags(replacement_tags=replacement_tags)
 
         # Refresh the jobs and check that the tags were updated correctly.
         job_set.retrieve_jobs(provider, refresh=True)
+
+        for job in job_set.jobs():
+            self.log.warning('AFTER: JOB %s tags %s', job.job_id(), job.tags())
+
         for job in job_set.jobs():
             job_id = job.job_id()
             with self.subTest(job_id=job_id):
@@ -391,6 +398,9 @@ class TestIBMQJobManager(IBMQTestCase):
 
         ibmq_provider_logger = logging.getLogger(IBMQ_PROVIDER_LOGGER_NAME)
 
+        for job in job_set.jobs():
+            self.log.warning('BEFORE: JOB %s tags %s', job.job_id(), job.tags())
+
         # Update the job tags, while capturing the log output.
         with self.assertLogs(logger=ibmq_provider_logger, level='WARNING') as log_records:
             _ = job_set.update_tags(removal_tags=[job_set._id_long])
@@ -398,6 +408,10 @@ class TestIBMQJobManager(IBMQTestCase):
         # Refresh the jobs, check the job set id is still present, and assert a log warning
         # was issued for the attempt to remove the job set id from the job's tags.
         job_set.retrieve_jobs(provider, refresh=True)
+
+        for job in job_set.jobs():
+            self.log.warning('AFTER: JOB %s tags %s', job.job_id(), job.tags())
+
         for i, job in enumerate(job_set.jobs()):
             job_id = job.job_id()
             with self.subTest(job_id=job_id):

@@ -399,6 +399,8 @@ class TestIBMQJobAttributes(JobTestCase):
             with self.subTest(tags_to_replace=tags_to_replace):
                 _ = job.update_tags(replacement_tags=tags_to_replace)  # Update the job tags.
                 job.refresh()
+                self.log.warning('Tags after refresh: %s', job.tags())
+                self.log.warning('Tags after refresh: %s', job.tags())
                 self.assertEqual(set(job.tags()), set(tags_to_replace),
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
@@ -427,6 +429,7 @@ class TestIBMQJobAttributes(JobTestCase):
             with self.subTest(tags_to_add=tags_to_add):
                 _ = job.update_tags(additional_tags=tags_to_add)  # Update the job tags.
                 job.refresh()
+                self.log.warning('Tags after refresh: %s', job.tags())
                 self.assertEqual(set(job.tags()), set(tags_after_add),
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
@@ -469,6 +472,7 @@ class TestIBMQJobAttributes(JobTestCase):
 
                 # Refresh the job and check that the tags were updated correctly.
                 job.refresh()
+                self.log.warning('Tags after refresh: %s', job.tags())
                 self.assertEqual(set(job.tags()), tags_after_removal_set,
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
