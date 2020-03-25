@@ -402,8 +402,7 @@ class TestIBMQJobManager(IBMQTestCase):
             self.log.warning('BEFORE: JOB %s tags %s', job.job_id(), job.tags())
 
         # Update the job tags, while capturing the log output.
-        with self.assertLogs(logger=ibmq_provider_logger, level='WARNING') as log_records:
-            _ = job_set.update_tags(removal_tags=[job_set._id_long])
+        _ = job_set.update_tags(removal_tags=[job_set._id_long])
 
         # Refresh the jobs, check the job set id is still present, and assert a log warning
         # was issued for the attempt to remove the job set id from the job's tags.

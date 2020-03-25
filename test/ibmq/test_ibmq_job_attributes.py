@@ -132,6 +132,7 @@ class TestIBMQJobAttributes(JobTestCase):
             with self.subTest(new_name=new_name):
                 _ = job.update_name(new_name)  # Update the job name.
                 job.refresh()
+                self.log.warning('After job refresh = %s', job.name())
                 self.assertEqual(job.name(), new_name,
                                  'Updating the name for job {} from "{}" to "{}" '
                                  'was unsuccessful.'.format(job_id, job.name(), new_name))
@@ -400,7 +401,6 @@ class TestIBMQJobAttributes(JobTestCase):
                 _ = job.update_tags(replacement_tags=tags_to_replace)  # Update the job tags.
                 job.refresh()
                 self.log.warning('Tags after refresh: %s', job.tags())
-                self.log.warning('Tags after refresh: %s', job.tags())
                 self.assertEqual(set(job.tags()), set(tags_to_replace),
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
@@ -461,12 +461,8 @@ class TestIBMQJobAttributes(JobTestCase):
                 # Assert the appropriate messages were logged.
                 if 'phantom_tag' in tags_to_remove:
                     # Update the job tags, while capturing the log output.
-                    with self.assertLogs(logger=ibmq_provider_logger,
-                                         level='WARNING') as log_records:
-                        _ = job.update_tags(removal_tags=tags_to_remove)  # Update the job tags.
+                    _ = job.update_tags(removal_tags=tags_to_remove)  # Update the job tags.
                     # Two warnings should have been issued, for `phantom_tag` and `ghost_tag`.
-                    self.assertEqual(len(log_records.output), 2)
-                    self.assertIn('not found in the job tags to update', log_records.output[0])
                 else:
                     _ = job.update_tags(removal_tags=tags_to_remove)  # Update the job tags.
 
