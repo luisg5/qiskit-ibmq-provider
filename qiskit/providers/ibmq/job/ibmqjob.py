@@ -722,6 +722,7 @@ class IBMQJob(BaseModel, BaseJob):
         """
         with api_to_job_error():
             api_response = self._api.job_get(self.job_id())
+            logger.debug('Refresh response = %s', api_response)
 
         saved_model_cls = JobResponseSchema.model_cls
         try:
