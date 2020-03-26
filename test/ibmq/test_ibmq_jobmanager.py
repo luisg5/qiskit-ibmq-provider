@@ -15,7 +15,6 @@
 """Tests for the IBMQJobManager."""
 
 import copy
-import logging
 import time
 from inspect import getfullargspec, isfunction
 import uuid
@@ -30,7 +29,6 @@ from qiskit.providers.ibmq.managed import managedjob
 from qiskit.providers.ibmq.managed.exceptions import (
     IBMQJobManagerJobNotFound, IBMQManagedResultDataNotAvailable, IBMQJobManagerInvalidStateError)
 from qiskit.providers.jobstatus import JobStatus, JOB_FINAL_STATES
-from qiskit.providers.ibmq import IBMQ_PROVIDER_LOGGER_NAME
 from qiskit.compiler import transpile, assemble
 
 from ..ibmqtestcase import IBMQTestCase
@@ -396,8 +394,6 @@ class TestIBMQJobManager(IBMQTestCase):
                   for status in job_set.statuses()):
             time.sleep(0.5)
 
-        ibmq_provider_logger = logging.getLogger(IBMQ_PROVIDER_LOGGER_NAME)
-
         for job in job_set.jobs():
             self.log.warning('BEFORE: JOB %s tags %s', job.job_id(), job.tags())
 
@@ -411,7 +407,7 @@ class TestIBMQJobManager(IBMQTestCase):
         for job in job_set.jobs():
             self.log.warning('AFTER: JOB %s tags %s', job.job_id(), job.tags())
 
-        for i, job in enumerate(job_set.jobs()):
+        for job in job_set.jobs():
             job_id = job.job_id()
             with self.subTest(job_id=job_id):
                 self.assertIn(job_set._id_long, job.tags(),
