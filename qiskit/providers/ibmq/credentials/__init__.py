@@ -93,11 +93,13 @@ def discover_credentials(
     for display_name, (reader_function, kwargs) in readers.items():
         try:
             stored_account_info = reader_function(**kwargs)  # type: ignore[arg-type]
-            if reader_function == read_credentials_from_qiskitrc:
+            if display_name == 'qiskitrc':
                 # Read from `qiskitrc`, which may have a stored provider.
                 credentials, stored_provider = stored_account_info
+                print('credentials = {}, stored_provider = {}'.format(credentials, stored_provider))
             else:
                 credentials = stored_account_info
+                print('credentials = {}'.format(credentials))
             logger.info('Using credentials from %s', display_name)
             if credentials:
                 break

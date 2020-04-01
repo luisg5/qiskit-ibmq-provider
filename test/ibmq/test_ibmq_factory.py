@@ -258,7 +258,8 @@ class TestIBMQFactoryAccounts(IBMQTestCase):
         # Hub, group, project in correct format but does not exists.
         invalid_hgp_to_store = 'invalid_hub/invalid_group/invalid_project'
         self.log.warning('invalid_hgp_to_store = %s', invalid_hgp_to_store)
-        with custom_qiskitrc() as _file:
+        # TODO: Add this to the other test, no environment variables.
+        with custom_qiskitrc() as _file, no_envs(CREDENTIAL_ENV_VARS):
             self.log.warning('DEFAULT_FILE = %s', _file.default_qiskitrc_file_original)
             self.log.warning('TEMP_FILE = %s', _file.tmp_file.name)
             hgp = HubGroupProject.from_str(invalid_hgp_to_store)
