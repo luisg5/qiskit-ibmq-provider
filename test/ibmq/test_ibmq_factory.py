@@ -118,6 +118,7 @@ class TestIBMQFactoryEnableAccount(IBMQTestCase):
             ibmq.enable_account(qe_token, qe_url, proxies=proxies)
         self.assertIn('ProxyError', str(context_manager.exception))
 
+    @skipIf(os.name == 'nt', 'Test not supported in Windows')
     @requires_qe_access
     def test_enable_specified_provider(self, qe_token, qe_url):
         """Test enabling an account with a specified provider."""
@@ -257,10 +258,14 @@ class TestIBMQFactoryAccounts(IBMQTestCase):
         # Hub, group, project in correct format but does not exists.
         invalid_hgp_to_store = 'invalid_hub/invalid_group/invalid_project'
         self.log.warning('invalid_hgp_to_store = %s', invalid_hgp_to_store)
-        with custom_qiskitrc():
+        with custom_qiskitrc() as _file:
+            self.log.warning('DEFAULT_FILE = %s', _file.default_qiskitrc_file_original)
+            self.log.warning('TEMP_FILE = %s', _file.tmp_file.name)
             hgp = HubGroupProject.from_str(invalid_hgp_to_store)
             self.factory.save_account(token=qe_token, url=AUTH_URL,
                                       hub=hgp.hub, group=hgp.group, project=hgp.project)
+            lines = open(_file.tmp_file.name).readlines()
+            self.log.warning('TEMP_FILE_CONTENT = %s', lines)
             stored_cred = self.factory.stored_account()
             with self.assertRaises(IBMQAccountError) as context_manager:
                 provider = self.factory.load_account()
