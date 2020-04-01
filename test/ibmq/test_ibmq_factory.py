@@ -256,7 +256,7 @@ class TestIBMQFactoryAccounts(IBMQTestCase):
 
         # Hub, group, project in correct format but does not exists.
         invalid_hgp_to_store = 'invalid_hub/invalid_group/invalid_project'
-        print(invalid_hgp_to_store)
+        self.log.warning('invalid_hgp_to_store = %s', invalid_hgp_to_store)
         with custom_qiskitrc():
             hgp = HubGroupProject.from_str(invalid_hgp_to_store)
             self.factory.save_account(token=qe_token, url=AUTH_URL,
@@ -264,7 +264,7 @@ class TestIBMQFactoryAccounts(IBMQTestCase):
             stored_cred = self.factory.stored_account()
             with self.assertRaises(IBMQAccountError) as context_manager:
                 provider = self.factory.load_account()
-                print('PROVIDER = {}'.format(provider))
+                self.log.warning('PROVIDER = %s', provider)
             self.assertIn('The default provider (hub/group/project) stored on',
                           str(context_manager.exception))
 
