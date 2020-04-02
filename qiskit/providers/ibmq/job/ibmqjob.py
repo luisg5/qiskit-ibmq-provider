@@ -303,12 +303,16 @@ class IBMQJob(BaseModel, BaseJob):
                 '"{}" of type "{}" is not a valid job name. '
                 'The job name needs to be a string.'.format(name, type(str)))
 
+        logger.debug('name before update = %s, name to update to = %s',
+                     self.name(), name)
+
         with api_to_job_error():
             response = self._api.job_update_attribute(
                 job_id=self.job_id(), attr_name='name', attr_value=name)
 
         # Get the name from the response and check if the update was successful.
         updated_name = response.get('name', None)
+        logger.debug('name after update (response value) = %s', updated_name)
         if (updated_name is None) or (name != updated_name):
             raise IBMQJobUpdateError('An error occurred when updating the name '
                                      'for job {}. Please, try again.'.format(self.job_id()))
@@ -361,12 +365,16 @@ class IBMQJob(BaseModel, BaseJob):
             tags_to_update = self._remove_tags(
                 tags_to_update, removal_tags, ibmq_jobset_prefix)
 
+        logger.debug('tags before update = %s, tags to update to = %s',
+                     self.tags(), tags_to_update)
+
         with api_to_job_error():
             response = self._api.job_update_attribute(
                 job_id=self.job_id(), attr_name='tags', attr_value=list(tags_to_update))
 
         # Get the tags from the response and check if the update was successful.
         updated_tags = response.get('tags', None)
+        logger.debug('tags after update (response value) = %s', updated_tags)
         if (updated_tags is None) or (set(updated_tags) != tags_to_update):
             raise IBMQJobUpdateError('An error occurred when updating the name '
                                      'for job {}. Please, try again.'
@@ -713,12 +721,14 @@ class IBMQJob(BaseModel, BaseJob):
         """
         with api_to_job_error():
             api_response = self._api.job_get(self.job_id())
+            logger.debug('refresh job (response value) = %s', api_response)
 
         saved_model_cls = JobResponseSchema.model_cls
         try:
             # Load response into a dictionary
             JobResponseSchema.model_cls = dict
             data = self.schema.load(api_response)
+            logger.debug('refresh job (as dict) = %s', data)
             BaseModel.__init__(self, **data)
 
             # Model attributes.
