@@ -728,7 +728,6 @@ class IBMQJob(BaseModel, BaseJob):
             # Load response into a dictionary
             JobResponseSchema.model_cls = dict
             data = self.schema.load(api_response)
-            logger.debug('refresh job (as dict) = %s', data)
             BaseModel.__init__(self, **data)
 
             # Model attributes.
