@@ -14,6 +14,7 @@
 
 """Test IBMQJob attributes."""
 
+import logging
 import time
 from unittest import mock
 import re
@@ -22,6 +23,7 @@ import uuid
 from qiskit.test import slow_test
 from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister
 from qiskit.providers.jobstatus import JobStatus, JOB_FINAL_STATES
+from qiskit.providers.ibmq import IBMQ_PROVIDER_LOGGER_NAME
 from qiskit.providers.ibmq.job.exceptions import IBMQJobFailureError
 from qiskit.providers.ibmq.api.clients.account import AccountClient
 from qiskit.providers.ibmq.exceptions import IBMQBackendValueError
@@ -30,6 +32,8 @@ from qiskit.compiler import assemble, transpile
 from ..jobtestcase import JobTestCase
 from ..decorators import requires_provider, requires_device
 from ..utils import most_busy_backend, cancel_job, get_large_circuit
+
+PROVIDER_LOGGER = logging.getLogger(IBMQ_PROVIDER_LOGGER_NAME)
 
 
 class TestIBMQJobAttributes(JobTestCase):
@@ -130,7 +134,12 @@ class TestIBMQJobAttributes(JobTestCase):
         for new_name in new_names_to_test:
             with self.subTest(new_name=new_name):
                 _ = job.update_name(new_name)  # Update the job name.
-                job.refresh()
+                start = time.time()
+                for i in range(4):
+                    job.refresh()
+                    PROVIDER_LOGGER.debug('After %s seconds, Refresh iteration %s) %s',
+                                          time.time() - start, i, job.name())
+                    time.sleep(3)
                 self.assertEqual(job.name(), new_name,
                                  'Updating the name for job {} from "{}" to "{}" '
                                  'was unsuccessful.'.format(job_id, job.name(), new_name))
@@ -399,7 +408,12 @@ class TestIBMQJobAttributes(JobTestCase):
         for tags_to_replace in tags_to_replace_subtests:
             with self.subTest(tags_to_replace=tags_to_replace):
                 _ = job.update_tags(replacement_tags=tags_to_replace)  # Update the job tags.
-                job.refresh()
+                start = time.time()
+                for i in range(4):
+                    job.refresh()
+                    PROVIDER_LOGGER.debug('After %s seconds, Refresh iteration %s) %s',
+                                          time.time() - start, i, job.tags())
+                    time.sleep(3)
                 self.assertEqual(set(job.tags()), set(tags_to_replace),
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
@@ -427,7 +441,12 @@ class TestIBMQJobAttributes(JobTestCase):
             tags_after_add = job.tags() + tags_to_add
             with self.subTest(tags_to_add=tags_to_add):
                 _ = job.update_tags(additional_tags=tags_to_add)  # Update the job tags.
-                job.refresh()
+                start = time.time()
+                for i in range(4):
+                    job.refresh()
+                    PROVIDER_LOGGER.debug('After %s seconds, Refresh iteration %s) %s',
+                                          time.time() - start, i, job.tags())
+                    time.sleep(3)
                 self.assertEqual(set(job.tags()), set(tags_after_add),
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
@@ -457,9 +476,12 @@ class TestIBMQJobAttributes(JobTestCase):
             with self.subTest(tags_to_remove=tags_to_remove):
                 # Assert the appropriate messages were logged.
                 _ = job.update_tags(removal_tags=tags_to_remove)  # Update the job tags.
-
-                # Refresh the job and check that the tags were updated correctly.
-                job.refresh()
+                start = time.time()
+                for i in range(4):
+                    job.refresh()
+                    PROVIDER_LOGGER.debug('After %s seconds, Refresh iteration %s) %s',
+                                          time.time() - start, i, job.tags())
+                    time.sleep(3)
                 self.assertEqual(set(job.tags()), tags_after_removal_set,
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'

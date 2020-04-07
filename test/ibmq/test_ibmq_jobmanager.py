@@ -14,6 +14,7 @@
 
 """Tests for the IBMQJobManager."""
 
+import logging
 import copy
 import time
 from inspect import getfullargspec, isfunction
@@ -23,6 +24,7 @@ from concurrent.futures import wait
 from qiskit import QuantumCircuit
 from qiskit.result import Result
 
+from qiskit.providers.ibmq import IBMQ_PROVIDER_LOGGER_NAME
 from qiskit.providers.ibmq.managed.ibmqjobmanager import IBMQJobManager
 from qiskit.providers.ibmq.managed.managedresults import ManagedResults
 from qiskit.providers.ibmq.managed import managedjob
@@ -36,6 +38,8 @@ from ..ibmqtestcase import IBMQTestCase
 from ..decorators import requires_provider
 from ..fake_account_client import BaseFakeAccountClient, CancelableFakeJob, JobSubmitFailClient
 from ..utils import cancel_job
+
+PROVIDER_LOGGER = logging.getLogger(IBMQ_PROVIDER_LOGGER_NAME)
 
 
 class TestIBMQJobManager(IBMQTestCase):
@@ -339,7 +343,12 @@ class TestIBMQJobManager(IBMQTestCase):
         _ = job_set.update_tags(replacement_tags=replacement_tags)
 
         # Refresh the jobs and check that the tags were updated correctly.
-        job_set.retrieve_jobs(provider, refresh=True)
+        start = time.time()
+        for i in range(4):
+            job_set.retrieve_jobs(provider, refresh=True)
+            PROVIDER_LOGGER.debug('After %s seconds, Refresh iteration %s) %s',
+                                  time.time() - start, i, job_set.tags())
+            time.sleep(3)
         for job in job_set.jobs():
             job_id = job.job_id()
             with self.subTest(job_id=job_id):
@@ -369,7 +378,12 @@ class TestIBMQJobManager(IBMQTestCase):
 
         # Refresh the jobs, check the job set id is still present, and assert a log warning
         # was issued for the attempt to remove the job set id from the job's tags.
-        job_set.retrieve_jobs(provider, refresh=True)
+        start = time.time()
+        for i in range(4):
+            job_set.retrieve_jobs(provider, refresh=True)
+            PROVIDER_LOGGER.debug('After %s seconds, Refresh iteration %s) %s',
+                                  time.time() - start, i, job_set.tags())
+            time.sleep(3)
         for job in job_set.jobs():
             job_id = job.job_id()
             with self.subTest(job_id=job_id):
