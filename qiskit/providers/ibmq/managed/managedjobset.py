@@ -468,7 +468,7 @@ class ManagedJobSet:
                 updated_tags = job.update_tags(replacement_tags=replacement_tags,
                                                additional_tags=additional_tags,
                                                removal_tags=removal_tags)
-                logger.debug('ManagedJobSet - %s updated_tags: %s', job.job_id(), updated_tags)
+                logger.debug('ManagedJobSet - %s) updated_tags: %s', job.job_id(), updated_tags)
 
         # Cache the updated job set tags.
         self._tags = updated_tags

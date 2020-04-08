@@ -399,12 +399,12 @@ class TestIBMQJobAttributes(JobTestCase):
         for tags_to_replace in tags_to_replace_subtests:
             with self.subTest(tags_to_replace=tags_to_replace):
                 _ = job.update_tags(replacement_tags=tags_to_replace)  # Update the job tags.
+                time.sleep(1)  # Cached results may be returned, wait before refresh.
                 job.refresh()
                 self.assertEqual(set(job.tags()), set(tags_to_replace),
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
                                  .format(job_id, job.tags(), tags_to_replace))
-                time.sleep(1)  # Cached results may be returned, wait before refresh.
 
     @requires_provider
     def test_job_tags_add(self, provider):
@@ -428,12 +428,12 @@ class TestIBMQJobAttributes(JobTestCase):
             tags_after_add = job.tags() + tags_to_add
             with self.subTest(tags_to_add=tags_to_add):
                 _ = job.update_tags(additional_tags=tags_to_add)  # Update the job tags.
+                time.sleep(1)  # Cached results may be returned, wait before refresh.
                 job.refresh()
                 self.assertEqual(set(job.tags()), set(tags_after_add),
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
                                  .format(job_id, job.tags(), tags_after_add))
-                time.sleep(1)  # Cached results may be returned, wait before updating again.
 
     @requires_provider
     def test_job_tags_remove(self, provider):
@@ -470,13 +470,13 @@ class TestIBMQJobAttributes(JobTestCase):
                 else:
                     _ = job.update_tags(removal_tags=tags_to_remove)  # Update the job tags.
 
+                time.sleep(1)  # Cached results may be returned, wait before refresh.
                 # Refresh the job and check that the tags were updated correctly.
                 job.refresh()
                 self.assertEqual(set(job.tags()), tags_after_removal_set,
                                  'Updating the tags for job {} was unsuccessful.'
                                  'The tags are {}, but they should be {}.'
                                  .format(job_id, job.tags(), list(tags_after_removal_set)))
-                time.sleep(1)  # Cached results may be returned, wait before refresh.
 
     @requires_provider
     def test_invalid_job_tags(self, provider):
