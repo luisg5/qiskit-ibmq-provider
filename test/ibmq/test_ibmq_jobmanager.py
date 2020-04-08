@@ -338,7 +338,7 @@ class TestIBMQJobManager(IBMQTestCase):
         # Update the tags
         _ = job_set.update_tags(replacement_tags=replacement_tags)
 
-        time.sleep(1)  # Cached results may be returned, wait before refresh.
+        time.sleep(0.5)  # Cached results may be returned, wait before retrieving.
 
         # Refresh the jobs and check that the tags were updated correctly.
         job_set.retrieve_jobs(provider, refresh=True)
@@ -369,7 +369,7 @@ class TestIBMQJobManager(IBMQTestCase):
         # Update the job tags
         _ = job_set.update_tags(removal_tags=[job_set._id_long])
 
-        time.sleep(1)  # Cached results may be returned, wait before refresh.
+        time.sleep(0.5)  # Cached results may be returned, wait before retrieving.
 
         # Refresh the jobs, check job set id is still present, and assert a log warning
         # was issued for the attempt to remove the job set id from the job's tags.
