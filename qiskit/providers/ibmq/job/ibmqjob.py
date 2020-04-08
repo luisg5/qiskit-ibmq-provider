@@ -309,6 +309,8 @@ class IBMQJob(BaseModel, BaseJob):
 
         # Get the name from the response and check if the update was successful.
         updated_name = response.get('name', None)
+        logger.debug('%s) name_to_update = %s, updated_name = %s',
+                     self.job_id(), name, updated_name)
         if (updated_name is None) or (name != updated_name):
             raise IBMQJobUpdateError('An error occurred when updating the name '
                                      'for job {}. Please, try again.'.format(self.job_id()))
@@ -367,6 +369,8 @@ class IBMQJob(BaseModel, BaseJob):
 
         # Get the tags from the response and check if the update was successful.
         updated_tags = response.get('tags', None)
+        logger.debug('%s) tags_to_update = %s, updated_tags = %s',
+                     self.job_id(), tags_to_update, updated_tags)
         if (updated_tags is None) or (set(updated_tags) != tags_to_update):
             raise IBMQJobUpdateError('An error occurred when updating the tags '
                                      'for job {}. Please, try again.'
