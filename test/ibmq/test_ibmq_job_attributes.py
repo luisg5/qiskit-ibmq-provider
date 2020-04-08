@@ -131,11 +131,11 @@ class TestIBMQJobAttributes(JobTestCase):
         for new_name in new_names_to_test:
             with self.subTest(new_name=new_name):
                 _ = job.update_name(new_name)  # Update the job name.
+                time.sleep(1)  # Cached results may be returned, wait before updating again.
                 job.refresh()
                 self.assertEqual(job.name(), new_name,
                                  'Updating the name for job {} from "{}" to "{}" '
                                  'was unsuccessful.'.format(job_id, job.name(), new_name))
-                time.sleep(1)  # Cached results may be returned, wait before updating again.
 
     @requires_provider
     def test_duplicate_job_name(self, provider):
