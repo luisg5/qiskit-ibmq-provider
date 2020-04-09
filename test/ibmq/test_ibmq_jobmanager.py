@@ -338,10 +338,14 @@ class TestIBMQJobManager(IBMQTestCase):
         # Update the tags
         _ = job_set.update_tags(replacement_tags=replacement_tags)
 
+        # Wait before retrieving jobs and refreshing.
+        time.sleep(10)
+
         # Refresh the jobs and check that the tags were updated correctly.
         job_set.retrieve_jobs(provider, refresh=True)
         for job in job_set.jobs():
             job_id = job.job_id()
+            job.refresh()
             with self.subTest(job_id=job_id):
                 self.assertEqual(set(job.tags()), set(replacement_tags_with_id_long),
                                  'Updating the tags for job {} was unsuccessful.'
@@ -369,11 +373,15 @@ class TestIBMQJobManager(IBMQTestCase):
         # Update the job tags
         _ = job_set.update_tags(removal_tags=initial_job_tags_with_id_long)
 
+        # Wait before retrieving jobs and refreshing.
+        time.sleep(10)
+
         # Refresh the jobs, and check that the job set long id is still present
         # after updating.
         job_set.retrieve_jobs(provider, refresh=True)
         for job in job_set.jobs():
             job_id = job.job_id()
+            job.refresh()
             with self.subTest(job_id=job_id):
                 self.assertEqual(job.tags(), [job_set._id_long],
                                  'Updating the tags for job {} was unsuccessful.'
