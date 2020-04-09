@@ -309,6 +309,8 @@ class IBMQJob(BaseModel, BaseJob):
 
         # Get the name from the response and check if the update was successful.
         updated_name = response.get('name', None)
+        logger.debug('job %s) desired_name = %s, updated_name (response) = %s',
+                     self.job_id(), name, updated_name)
         if (updated_name is None) or (name != updated_name):
             raise IBMQJobUpdateError('An unexpected error occurred when updating the '
                                      'name for job {}: The name was not updated for '
@@ -372,6 +374,8 @@ class IBMQJob(BaseModel, BaseJob):
 
         # Get the tags from the response and check if the update was successful.
         updated_tags = response.get('tags', None)
+        logger.debug('job %s) desired_tags = %s, updated_tags (response) = %s',
+                     self.job_id(), tags_to_update, updated_tags)
         if (updated_tags is None) or (set(updated_tags) != tags_to_update):
             raise IBMQJobUpdateError('An unexpected error occurred when updating the '
                                      'tags for job {}: The tags were not updated for '
@@ -720,6 +724,8 @@ class IBMQJob(BaseModel, BaseJob):
         """
         with api_to_job_error():
             api_response = self._api.job_get(self.job_id())
+            logger.debug('job %s) refresh (response) = %s',
+                         self.job_id(), api_response)
 
         saved_model_cls = JobResponseSchema.model_cls
         try:
