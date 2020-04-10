@@ -132,7 +132,7 @@ class TestIBMQJobAttributes(JobTestCase):
                 _ = job.update_name(new_name)  # Update the job name.
                 # Cached results may be returned if updating too quickly.
                 # Wait before updating again.
-                time.sleep(1)
+                time.sleep(2)
                 job.refresh()
                 self.assertEqual(job.name(), new_name,
                                  'Updating the name for job {} from "{}" to "{}" '
