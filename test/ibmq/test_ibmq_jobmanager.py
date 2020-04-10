@@ -339,7 +339,7 @@ class TestIBMQJobManager(IBMQTestCase):
         _ = job_set.update_tags(replacement_tags=replacement_tags)
 
         # Wait before retrieving jobs and refreshing.
-        time.sleep(10)
+        time.sleep(1)
 
         # Refresh the jobs and check that the tags were updated correctly.
         job_set.retrieve_jobs(provider, refresh=True)
@@ -374,7 +374,7 @@ class TestIBMQJobManager(IBMQTestCase):
         _ = job_set.update_tags(removal_tags=initial_job_tags_with_id_long)
 
         # Wait before retrieving jobs and refreshing.
-        time.sleep(10)
+        time.sleep(1)
 
         # Refresh the jobs, and check that the job set long id is still present
         # after updating.
